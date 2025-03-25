@@ -12,20 +12,16 @@ export function createCard(
   cardTemplate
 ) {
   const cardElement = cardTemplate.cloneNode(true);
-
   const cardImage = cardElement.querySelector(".card__image");
   const cardTitle = cardElement.querySelector(".card__title");
   const deleteButton = cardElement.querySelector(".card__delete-button");
   const likeButton = cardElement.querySelector(".card__like-button");
-
   cardImage.src = cardData.link;
   cardImage.alt = cardData.name;
   cardTitle.textContent = cardData.name;
-
   deleteButton.addEventListener("click", function () {
     handleDeleteCard(cardElement);
   });
-
   likeButton.addEventListener("click", function () {
     handleLikeCard(likeButton);
   });
@@ -33,7 +29,6 @@ export function createCard(
   cardImage.addEventListener("click", () => {
     handleCardClick(cardData);
   });
-
   return cardElement;
 }
 

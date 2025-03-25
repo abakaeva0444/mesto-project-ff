@@ -2,15 +2,16 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); 
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = {
-  entry: { main: './src/index.js' },
+  entry: './src/components/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'main.js',
         publicPath: ''
   },
-    mode: 'development',
+    mode: 'development', devtool: 'eval-source-map',
   devServer: {
     static: path.resolve(__dirname, './dist'),
     compress: true,
@@ -46,5 +47,11 @@ module.exports = {
     }),
         new CleanWebpackPlugin(),
         new MiniCssExtractPlugin()
-  ]
+  ],
+
+  optimization: {
+    minimizer: [
+        new CssMinimizerPlugin(),
+    ],
+},
 };

@@ -1,4 +1,4 @@
-import "./index.css";
+import "../index.css";
 import { initialCards } from "./cards.js";
 import { createCard, deleteCard, handleLikeCard } from "./card.js";
 import { openModal, closeModal, handleEscClose } from "./modal.js";
