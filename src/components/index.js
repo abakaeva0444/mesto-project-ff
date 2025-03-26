@@ -37,14 +37,16 @@ const cardLinkInput = formNewCardElement.querySelector(
   ".popup__input_type_url"
 );
 
-// Функция для открытия попапа с изображением
-function handleCardClick(cardData) {
-  const popupImageElement = popupImage.querySelector(".popup__image");
-  const popupCaption = popupImage.querySelector(".popup__caption");
+//image popup
+const popupImageElement = popupImage.querySelector(".popup__image");
+const popupCaption = popupImage.querySelector(".popup__caption");
 
-  popupImageElement.src = cardData.link;
-  popupImageElement.alt = cardData.name;
-  popupCaption.textContent = cardData.name;
+// Функция для открытия попапа с изображением
+
+function handleCardClick(imageSrc, imageAlt) {
+  popupImageElement.src = imageSrc;
+  popupImageElement.alt = imageAlt;
+  popupCaption.textContent = imageAlt;
 
   openModal(popupImage);
 }
@@ -79,8 +81,9 @@ addButton.addEventListener("click", () => {
 
 // Обработчики событий для кнопок закрытия (крестиков)
 popupCloseButtons.forEach((button) => {
-  button.addEventListener("click", (event) => {
-    const modal = event.target.closest(".popup");
+  const modal = button.closest(".popup");
+
+  button.addEventListener("click", () => {
     if (modal) {
       closeModal(modal);
     }
@@ -130,13 +133,3 @@ formNewCardElement.addEventListener("submit", handleAddCardSubmit);
 
 // Отображение начальных карточек
 initialCards.forEach(renderCard);
-
-// Обработчик клика по оверлею
-document.addEventListener("mousedown", (evt) => {
-  if (evt.target.classList.contains("popup_opened")) {
-    closeModal(evt.target);
-  }
-});
-
-// Обработчик закрытия по Esc
-document.addEventListener("keydown", handleEscClose);
