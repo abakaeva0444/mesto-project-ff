@@ -18,6 +18,7 @@ export function closeModal(modal) {
 export function handleEscClose(evt) {
   if (evt.key === "Escape") {
     const openedPopup = document.querySelector(".popup_opened");
+
     if (openedPopup) {
       closeModal(openedPopup);
     }

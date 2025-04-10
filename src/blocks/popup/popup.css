@@ -25,3 +25,10 @@
 .popup_opened {
   display: flex; 
 }
+
+.popup__error {
+  color: rgba(255, 0, 0, 1);
+ font-family: Inter;
+  font-weight: 400;
+}
+
