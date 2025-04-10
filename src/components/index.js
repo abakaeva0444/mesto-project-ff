@@ -1,8 +1,8 @@
 import "../index.css";
-
 import { createCard, deleteCard } from "./card.js";
 import { openModal, closeModal } from "./modal.js";
 import { enableValidation, resetValidation } from "./validation.js";
+
 import {
   getUserInfo,
   updateUserInfo,
@@ -10,6 +10,7 @@ import {
   getInitialCards,
   addCard,
   deleteCard as deleteCardApi,
+  toggleLike,
 } from "./api.js";
 
 // профиль
@@ -53,22 +54,21 @@ let userId = null;
 
 // Function renderCard
 
-function renderCard(cardData, userId) {
+function renderCard(cardData, userId, handleLikeClick) {
   const cardElement = createCard(
     cardData,
     userId,
     handleDeleteCard,
     handleCardClick,
-    cardTemplate,
-    popupImageElement,
-    popupCaption
+    handleLikeClick, // передаем колбэк лайка
+    cardTemplate
   );
 
   placesList.prepend(cardElement);
 }
 
 //Функция для открытия карточки
-function handleCardClick(link, name, popupImageElement, popupCaption) {
+function handleCardClick(link, name) {
   const popupImage = popupImageElement.querySelector(".popup__image");
   popupImage.src = link;
   popupImage.alt = name;
@@ -76,7 +76,6 @@ function handleCardClick(link, name, popupImageElement, popupCaption) {
 
   openModal(popupImageElement);
 }
-
 // // Функция для удаления карточки
 
 function handleDeleteCard(cardElement, cardId) {
@@ -89,22 +88,6 @@ function handleDeleteCard(cardElement, cardId) {
     });
 }
 
-//Функция загрузки информации о пользователе
-
-function loadUserInfo() {
-  getUserInfo()
-    .then((userData) => {
-      profileTitle.textContent = userData.name;
-      profileDescription.textContent = userData.about;
-      profileImage.style.backgroundImage = `url(${userData.avatar})`;
-      userId = userData._id;
-    })
-    .catch((error) => {
-      console.error("Ошибка при загрузке информации о пользователе:", error);
-    });
-}
-
-//Функция для инициализации страницы
 function initializePage() {
   Promise.all([getInitialCards(), getUserInfo()])
     .then(([cards, userData]) => {
@@ -114,11 +97,23 @@ function initializePage() {
       userId = userData._id;
 
       cards.forEach((cardData) => {
-        renderCard(cardData, userId);
+        renderCard(cardData, userId, handleLikeClick); // передаем колбэк лайка при создании
       });
     })
     .catch((error) => {
       console.error("Ошибка инициализации страницы:", error);
+    });
+}
+
+// Функция обработчик лайка
+function handleLikeClick(cardId, isLiked, likeButton, likeCountElement) {
+  toggleLike(cardId, isLiked) // Передаем текущее состояние лайка
+    .then((data) => {
+      likeCountElement.textContent = data.likes.length; // Обновляем счетчик лайков
+      likeButton.classList.toggle("card__like-button_is-active"); // Переключаем класс
+    })
+    .catch((err) => {
+      console.log(err);
     });
 }
 
@@ -147,7 +142,7 @@ function handleAddCardSubmit(evt) {
 
   addCard(nameValue, linkValue)
     .then((newCard) => {
-      renderCard(newCard, userId);
+      renderCard(newCard, userId, handleLikeClick); //  передаем колбэк лайка
       closeModal(popupAddCard);
       formAddCard.reset();
     })
@@ -172,6 +167,12 @@ function handleAvatarEditSubmit(evt) {
     });
 }
 
+// Обновление аватара
+profileImage.addEventListener("click", () => {
+  openModal(popupEditAvatar);
+  resetValidation(formAvatarEdit, validationConfig);
+});
+
 // Обработчик отправки формы редактирования аватара
 formAvatarEdit.addEventListener("submit", handleAvatarEditSubmit);
 
@@ -180,12 +181,6 @@ formEditProfile.addEventListener("submit", handleProfileEditSubmit);
 
 // Обработчик отправки формы добавления карточки
 formAddCard.addEventListener("submit", handleAddCardSubmit);
-
-//Обновление аватара
-profileImage.addEventListener("click", () => {
-  openModal(popupEditAvatar);
-  resetValidation(formAvatarEdit, validationConfig);
-});
 
 //Редактирование профиля
 profileEditButton.addEventListener("click", () => {
@@ -205,10 +200,10 @@ profileAddButton.addEventListener("click", () => {
 const popups = document.querySelectorAll(".popup");
 popups.forEach((popup) => {
   popup.addEventListener("mousedown", (evt) => {
-    if (evt.target.classList.contains("popup_opened")) {
-      closeModal(popup);
-    }
-    if (evt.target.classList.contains("popup__close")) {
+    if (
+      evt.target.classList.contains("popup_opened") ||
+      evt.target.classList.contains("popup__close")
+    ) {
       closeModal(popup);
     }
   });
